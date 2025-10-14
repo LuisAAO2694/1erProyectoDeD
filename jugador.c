@@ -40,7 +40,7 @@ typedef struct {
 
     //Contadores para los efectos temporales
     int turnosCongelado; //En caso de que (mayor que) > 0, el perosnaje pierde turnos
-    int ataqueFisico; //Este esun simple contador que cuenta los turnosrestantes para el buff de ataque
+    int buffAtaqueFisico; //Este esun simple contador que cuenta los turnosrestantes para el buff de ataque
     int originalAtaqueFisico; //Valor original para restaurar cunado termine el buff
     int debuffDefensaFisica; //Contador de. turnos. rerstantes para el debuff de defensa
     int buffOriginalDefensaFisica; //El valor original para rrestaurarr cunado temirne el debuff
@@ -143,17 +143,18 @@ void bendicionFuerza(void* objetivo)
     //Convierto el puntero void a tipo personaje
     Personaje* personajeObjetivo = (Personaje*)objetivo;
 
-    //Aqui guardo el valor original si es la primera vez que recibe el buff
-    //Mas que todo en este if permito que se restaure el valor original cuando termine el efecto
-    if(personajeObjetivo->ataqueFisico == 0)
-    {
-        personajeObjetivo->originalAtaqueFisico = personajeObjetivo->ataqueFisico;
-    }
+    //Aqui guardo el valor original, para poder restauralo cunado termine el buff
+    personajeObjetivo->originalAtaqueFisico = personajeObjetivo->ataqueFisico;
     
-    //Aqui aplicamos el aumento temporal
+    //Creo una variable temporal que me sirve para definir cuanto aumenta el ataque
+    //Para despues aplicarlo example(originalAtaqueFisico = 5 y aumento = 3)
+    //ataqueFisico = 5 + 3 = 8
     int aumento = 3;
-    personajeObjetivo->ataqueFisico = personajeObjetivo->buffOriginalDefensaFisica + aumento;
-    personajeObjetivo->ataqueFisico = 3; //Aqui le digo explicitamente que solo 3 turnos
+    personajeObjetivo->ataqueFisico = personajeObjetivo->originalAtaqueFisico + aumento;
+    
+    //Aqui establezco un contador para la duracion del buff
+    // 3 = tres turnos
+    personajeObjetivo->buffAtaqueFisico = 3;
 
     printf("¡%s recibe la Bendición de Fuerza!\n", personajeObjetivo->nombre);
     printf("Ataque físico aumentado en %d puntos por 3 turnos\n", aumento);
@@ -244,9 +245,10 @@ void actualizarEfectosTemporales(Personaje* personaje) {
     }
     
     //2-Fin de bendición de fuerza
-    if (personaje->ataqueFisico > 0) {
-        personaje->ataqueFisico--;  //Reducir contador de buff
-        if (personaje->ataqueFisico == 0) 
+    if (personaje->buffAtaqueFisico > 0) 
+    {
+        personaje->buffAtaqueFisico--;  //Reducir contador de buff
+        if (personaje->buffAtaqueFisico == 0) 
         {
             //Restauro el valor original del ataque fisico
             personaje->ataqueFisico = personaje->originalAtaqueFisico;
