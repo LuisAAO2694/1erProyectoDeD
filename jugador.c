@@ -272,14 +272,14 @@ void actualizarEfectosTemporales(Personaje* personaje) {
 }
 
 //Creamos una funcion que inicializa las magias
-//Esto mas que todo es para que el usuario pueda seleccionar 3
+//Esto mas que todo es para que el usuario pueda seleccionar 3 
 void inicializarMagiasDisponibles(void (**magiasDisponibles)(void*)) 
 {
-    magiasDisponibles[0] = bolaFuego;           //Magia 1: Daño directo
-    magiasDisponibles[1] = congelar;            //Magia 2: Pierde turno
-    magiasDisponibles[2] = bendicionFuerza;     //Magia 3: Buff temporal
-    magiasDisponibles[3] = maldicionDebilitadora; //Magia 4: Debuff temporal
-    magiasDisponibles[4] = sanacionDivina;      //Magia 5: Curación
+    *(magiasDisponibles + 0) = bolaFuego;           //Magia 1: Daño directo
+    *(magiasDisponibles + 1) = congelar;            //Magia 2: Pierde turno
+    *(magiasDisponibles + 2) = bendicionFuerza;     //Magia 3: Buff temporal
+    *(magiasDisponibles + 3) = maldicionDebilitadora; //Magia 4: Debuff temporal
+    *(magiasDisponibles + 4) = sanacionDivina;      //Magia 5: Curación
 }
 
 void mostrarMagiasDisponibles() 
@@ -290,6 +290,156 @@ void mostrarMagiasDisponibles()
     printf("3. Bendición Fuerza - Aumenta ataque físico por 3 turnos\n");
     printf("4. Maldición Debil. - Reduce defensa física por 3 turnos\n");
     printf("5. Sanación Divina  - Cura 8 puntos de daño\n");
+}
+
+//=== Crear Personaje ===
+void crearPersonajeJugador(Personaje* jugador)
+{
+    printf("\n");
+    printf("╔══════════════════════════════════════════════╗\n");
+    printf("║           CREACIÓN DE PERSONAJE              ║\n");
+    printf("╚══════════════════════════════════════════════╝\n\n");
+
+    printf("Elige el nombre de tu personaje\n");
+    printf("─────────────────────────────────────\n");
+    printf("Dame el nombre de tu personaje: ");
+
+    //Aqui primero obtenemos el nombre del teclado con el fgets
+    char nombreTemp[MAX_NOMBRE];
+    //Aqui leo el teclado
+    fgets(nombreTemp, sizeof(nombreTemp), stdin);
+
+    //Despues podemos eliminar el salto de linea que el fgets crea
+    //Investigamos y usamos strcspn que encuentra la posicion del \n y lo remplaza con \0
+    //strcspn(void * str, void * search);
+    nombreTemp[strcspn(nombreTemp, "\n")] = 0;
+
+    //Aqui copiamos el nombre en limpio a la struct del personaje
+    //strcpy(destino, origen)
+    strcpy(jugador->nombre, nombreTemp);
+    printf("✅ Nombre Guardado: %s\n\n", jugador->nombre);
+
+    //===Inicializar los atributos ===
+    printf("Inicializando tus atributos del persoanje...");
+    printf("─────────────────────────────────────\n");
+    sleep(5);
+
+    //Aqui configuramos los atributos base del personaje
+    jugador->HP = 20;
+    jugador->danio = 0;
+    jugador->ataqueFisico = 5;
+    jugador->ataqueMagico = 5;
+    jugador->defensaFisica = 5;
+    jugador->defensaMagica = 5;
+
+    //Aqui inicializo los contadores
+    jugador->turnosCongelado = 0;
+    jugador->buffAtaqueFisico = 0;
+    jugador->debuffDefensaFisica = 0;
+
+    //Inicializamos el inventario vacio=NULL
+    for (int i = 0; i < MAX_OBJETOS; i++)
+    {
+        *(jugador->inventario + i) = NULL; 
+    }
+
+    printf("✅ Atributos base inicializados:\n");
+    printf("   - Vida: %d HP\n", jugador->HP);
+    printf("   - Ataque Físico: %d\n", jugador->ataqueFisico);
+    printf("   - Ataque Mágico: %d\n", jugador->ataqueMagico);
+    printf("   - Defensa Física: %d\n", jugador->defensaFisica);
+    printf("   - Defensa Mágica: %d\n\n", jugador->defensaMagica);
+    
+
+    printf("Selección de Magias\n");
+    printf("─────────────────────────────────────\n");
+    printf("Elige 3 magias de las 5 disponibles para tu aventura\n");
+    printf("¡Elige sabiamente, no podrás cambiarlas después!\n\n");
+
+    //Mandamos a llamar a la funcion mostrarMagiasDisponibles, para ver las que estan disponibles
+    mostrarMagiasDisponibles();
+    
+    //Inicializamos un arreglo de punteros a funciones magicas
+    void (*magiasDisponibles[5])(void*);
+    //Le asignamos al arreglo un puntero a cada funcion magica
+    inicializarMagiasDisponibles(magiasDisponibles);
+
+    printf("\nSELECCIONA TUS 3 MAGIAS (ingresa los números 1-5):\n");
+    printf("─────────────────────────────────────────────────────\n");
+
+    //Creamos un contador de las magias elegidas
+    int magiasSeleccionadas = 0;
+    int selecciones[MAX_MAGIAS]; //Declaracion de las magias limite
+
+    //Inicializamos el arreglo de selecciones con -1 (sin la seleccion)
+    for(int i = 0; i < MAX_MAGIAS; i++)
+    {
+        *(selecciones + i) = -1; //-1 porque el usuario no. ha seleccionado nada, la seleccion empieza en 1-5
+    }
+    
+    //Aqui con el while creo un ciclo para seleccionar las 3 magias 
+    while (magiasSeleccionadas < MAX_MAGIAS)
+    {
+        printf("\n Selecciona magia %d/%d: ", magiasSeleccionadas + 1, MAX_MAGIAS);
+        
+        //Leo el numero que ingrese el usuario
+        int seleccion;
+        scanf("%d", &seleccion);
+
+        //Valido que seleccione el rango correcto
+        if(seleccion < 1 || seleccion > 5) 
+        {
+            printf("Error: Por favor ingresa un número entre 1 y 5\n");
+            continue;  // Volver al inicio del ciclo
+        }
+        
+        //Verificar si la magia ya fue seleccionada anteriormente
+        //Creamos nuestra bandera
+        int yaSeleccionada = 0;
+
+        //Aqui creamos un ciclo para checar todas las magias que se han seleccionado
+        for (int i = 0; i < magiasSeleccionadas; i++) 
+        {
+            //Checar si la magia que el usuario seleccioino ya existe en la lista de selecciones
+            if (*(selecciones + i) == seleccion) 
+            {
+                //Si se encuentra un duplicado cae aqui
+                yaSeleccionada = 1;
+                break; //Salimos
+            }
+        }
+        
+        //Si la bandera esta activada 
+        if (yaSeleccionada) 
+        {
+            //Entro y mando mensaje 
+            printf("Error: Ya seleccionaste esa magia. Elige una diferente\n");
+            continue; //Vuelve al while
+        }
+
+        //Si la seleccion es valida y sobre todo no se repite, la guardamos
+        *(selecciones + magiasSeleccionadas) = seleccion;
+
+        //Asignamos el puntero a funcion magica del personaje
+        //Resto 1 porque los arrays empiezan en 0 pero en conosla se vera como 1 (meramente visual)
+        *(jugador->magia + magiasSeleccionadas) = *(magiasDisponibles + (seleccion - 1));
+
+        //Extra - Le mostramos al usuario su confirmacion
+        printf("Magia %d asignada: ", seleccion);
+        switch(seleccion) 
+        {
+            case 1: printf("Bola de Fuego\n"); break;
+            case 2: printf("Congelar\n"); break;
+            case 3: printf("Bendición de Fuerza\n"); break;
+            case 4: printf("Maldición Debilitadora\n"); break;
+            case 5: printf("Sanación Divina\n"); break;
+        }
+        
+        magiasSeleccionadas++;  //Incrementar contador de magias seleccionadas
+    }
+
+    //Resumen de la creacion
+    //En construccion...
 }
 
 int main(int argc, char const *argv[])
