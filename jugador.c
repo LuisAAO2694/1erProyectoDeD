@@ -1,11 +1,9 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 
-# define MAX_NOMBRE 50;
 // aqui podemos definir que la cantidad de magias maximas es de 3
 // # define MAX_MAGIAS 3;
-
-#include <stdio.h>
 
 #define MAX_NOMBRE 50
 #define MAX_MAGIAS 3
@@ -13,15 +11,6 @@
 
 // Declaración adelantada de estructuras
 struct Objeto;
-
-//Estructura para las magias
-//La necesitamos. porque las magias solo pueden recibir 1 o 2 void*
-typedef struct 
-{
-    Personaje* atacante;   // Puntero al personaje que lanza la magia
-    Personaje* objetivo;   // Puntero al personaje que recibe la magia
-} DatosMagia;
-
 
 // Estructura base para todos los personajes (jugador y enemigos)
 typedef struct {
@@ -46,22 +35,31 @@ typedef struct {
     int buffOriginalDefensaFisica; //El valor original para rrestaurarr cunado temirne el debuff
 } Personaje;
 
-// Estructuras para los distintos jefes (heredan la base del personaje)
-typedef struct {
-    Personaje base;   // Enemigo fácil
-} EnemigoFacil;
 
-typedef struct {
-    Personaje base;   // Enemigo intermedio
-} EnemigoIntermedio;
+//Estructura para las magias
+//La necesitamos. porque las magias solo pueden recibir 1 o 2 void*
+typedef struct 
+{
+    Personaje* atacante;   // Puntero al personaje que lanza la magia
+    Personaje* objetivo;   // Puntero al personaje que recibe la magia
+} DatosMagia;
 
-typedef struct {
-    Personaje base;   // Enemigo difícil
-} EnemigoDificil;
+// // Estructuras para los distintos jefes (heredan la base del personaje)
+// typedef struct {
+//     Personaje base;   // Enemigo fácil
+// } EnemigoFacil;
 
-typedef struct {
-    Personaje base;   // Jefe final: Dragón de Obsidiana
-} JefeFinal;
+// typedef struct {
+//     Personaje base;   // Enemigo intermedio
+// } EnemigoIntermedio;
+
+// typedef struct {
+//     Personaje base;   // Enemigo difícil
+// } EnemigoDificil;
+
+// typedef struct {
+//     Personaje base;   // Jefe final: Dragón de Obsidiana
+// } JefeFinal;
 
 
 /*
@@ -438,12 +436,58 @@ void crearPersonajeJugador(Personaje* jugador)
         magiasSeleccionadas++;  //Incrementar contador de magias seleccionadas
     }
 
-    //Resumen de la creacion
-    //En construccion...
+    printf("\n");
+    printf("╔══════════════════════════════════════════════╗\n");
+    printf("║           PERSONAJE CREADO EXITOSAMENTE      ║\n");
+    printf("╚══════════════════════════════════════════════╝\n\n");
+
+    printf("👤 NOMBRE: %s\n", jugador->nombre);
+    printf("❤️ VIDA: %d HP\n", jugador->HP);
+    printf("⚔️ ATAQUE FÍSICO: %d\n", jugador->ataqueFisico);
+    printf("🔮 ATAQUE MÁGICO: %d\n", jugador->ataqueMagico);
+    printf("🛡️ DEFENSA FÍSICA: %d\n", jugador->defensaFisica);
+    printf("✨ DEFENSA MÁGICA: %d\n", jugador->defensaMagica);
+    
+    printf("\n🔮 MAGIAS SELECCIONADAS:\n");
+    printf("───────────────────────\n");
+
+    //Mostramos las magias que selecciono el usuario
+    for (int i = 0; i < MAX_MAGIAS; i++) 
+    {
+        //Muestro el numero de la magia
+        printf("%d. ", i + 1);
+
+        //En este switch determina que magia mostrar en funcion de lo que se guardo por el usuario
+        switch(*(selecciones + i)) //Acedemos al arreglo
+        {
+            case 1: printf("Bola de Fuego\n"); break;
+            case 2: printf("Congelar\n"); break;
+            case 3: printf("Bendición de Fuerza\n"); break;
+            case 4: printf("Maldición Debilitadora\n"); break;
+            case 5: printf("Sanación Divina\n"); break;
+        }
+    }
+    
+    printf("\n¡Que comience la aventura!!\n");
+}
+
+void mostrarMenuPrincipal()
+{
+    printf("\n");
+    printf("╔══════════════════════════════════════════════╗\n");
+    printf("║                 RPG DE TEXTO                 ║\n");
+    printf("║                                              ║\n");
+    printf("║  Diseño y Estructura de Datos - Proyecto 1   ║\n");
+    printf("╚══════════════════════════════════════════════╝\n\n");
+    
+    printf("Bienvenido valiente aventurero!\n");
+    printf("Te enfrentarás a 4 poderosos enemigos en épicas batallas\n");
+    printf("Crea tu personaje y prepárate para la aventura...\n\n");
+    sleep(5);
 }
 
 int main(int argc, char const *argv[])
 {
     // aqui un if que tenga que si la vida que esta como hp llega a el mismo valor que daño entonces se pierde 
-    // la cosa es que esto  es en cada pelea asi que va dentro de cada siclo por asi decirlo 
+    // la cosa es que esto  es en cada pelea asi que va dentro de cada siclo por asi decirlo     
 }
