@@ -9,8 +9,22 @@
 #define MAX_MAGIAS 3
 #define MAX_OBJETOS 5
 
-// Declaración adelantada de estructuras
-struct Objeto;
+//Aqui hacemos una estructura tipo objeto
+/*
+    atributo es:
+    0=HP
+    1=AtaqueFisico
+    2=AtaqueMagico
+    3=DefensaFisica
+    4=DefensaMagica
+*/
+typedef struct
+{
+    char nombre[MAX_NOMBRE];
+    int atributo;
+    int poder; //Num random entre 1 y 5
+} Objeto;
+
 
 // Estructura base para todos los personajes (jugador y enemigos)
 typedef struct {
@@ -22,7 +36,7 @@ typedef struct {
     int defensaFisica;                 // Defensa física
     int defensaMagica;                 // Defensa mágica
     void (*magia[MAX_MAGIAS])(void *); // apuntador a las magias 
-    struct Objeto *inventario[MAX_OBJETOS]; // apuntador a los objetos 
+    Objeto *inventario[MAX_OBJETOS]; // apuntador a los objetos 
 
     //btw buff = efecto posoitvo temporal que mejora algo "Solamente es un termino xd"
     //debuff = igual efecto temporal que decrementa algo
@@ -60,6 +74,40 @@ typedef struct
 // typedef struct {
 //     Personaje base;   // Jefe final: Dragón de Obsidiana
 // } JefeFinal;
+
+//Creamos un arreglo de nombres para los objetos
+const char *nombresBaseObj[] =
+{
+    "Espada", "Amuleto", "Anillo", "Escudo", "Armadura",
+    "Poción", "Cristal", "Talisman", "Corona", "Guantelete",
+    "Báculo", "Daga", "Arco", "Hacha", "Marte"
+};
+
+//Aqui creamos otro arreglo de nombres pero de atributos del usuario
+const char *nombresAtributos[] = 
+{
+    "HP", "Ataque Fisico", "Ataque Magico", "Defensa Fisica", "Defensa Magica"
+};
+
+//======================================================================================
+//Aqui creamos una funcion que "crear" un objeto dinamico con atributos aleatorios
+//Tenemos que retornar un puntero a objeto (debe de liberarse con free!!!) //No es void porque neceiistamos retornar un objeto
+Objeto *crearObjetoAleatorio()
+{
+    //Objetos con memoria dinamica
+    Objeto *new = (Objeto*)malloc(sizeof(Objeto));
+    //Esto nomas para manejo de errores, checar si hay memeoria dispnible para el objeto
+    if(new == NULL)
+    {
+        printf("==No se pudo asignar memoria para el objeto==\n");
+        return NULL;
+    }
+    
+    //Faltan cosas....
+    //Generar indices aleatorios
+
+} 
+
 
 
 /*
@@ -318,7 +366,7 @@ void crearPersonajeJugador(Personaje* jugador)
     printf("✅ Nombre Guardado: %s\n\n", jugador->nombre);
 
     //===Inicializar los atributos ===
-    printf("Inicializando tus atributos del persoanje...");
+    printf("Inicializando tus atributos del persoanje...\n");
     printf("─────────────────────────────────────\n");
     sleep(5);
 
@@ -489,5 +537,19 @@ void mostrarMenuPrincipal()
 int main(int argc, char const *argv[])
 {
     // aqui un if que tenga que si la vida que esta como hp llega a el mismo valor que daño entonces se pierde 
-    // la cosa es que esto  es en cada pelea asi que va dentro de cada siclo por asi decirlo     
+    // la cosa es que esto  es en cada pelea asi que va dentro de cada siclo por asi decirlo
+    
+    mostrarMenuPrincipal();
+
+    //Declaramos el arreglo de personajes
+    /*
+        Estructura jugadores:
+        jugadores[0] - Usuario
+        jugadores[1-5] - Enemigos
+    */
+    Personaje jugadores[5];
+
+    //Bien ahora tenemos que mandar a llamar a la funcion de crear personaje
+    //Dato: Paso la direccion del primer elemento del arreglo (&jugadores[0])
+    crearPersonajeJugador(jugadores);
 }
