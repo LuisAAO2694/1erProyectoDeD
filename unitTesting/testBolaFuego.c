@@ -40,7 +40,6 @@ typedef struct {
 
 /*
  * MAGIA 1: BOLA DE FUEGO - FUNCIÓN A PROBAR
- * Esta es exactamente tu función, copiada aquí para las pruebas
  */
 void bolaFuego(void* datos)
 {
