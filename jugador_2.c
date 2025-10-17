@@ -1175,5 +1175,86 @@ int main(int argc, char const *argv[])
     //Dato: Paso la direccion del primer elemento del arreglo (&jugadores[0])
     crearPersonajeJugador(jugadores);
 
+    const char *nombresEnemigos[] = 
+    {
+        "Orco Salvaje", "Mago Oscuro", "Caballero Negro", "Dragón de Fuego"
+    };
+    
+    //BATALLA 1-Enemigo Facil
+    strcpy(jugadores[1].nombre, "Orco Salvaje");
+    enemigoFacil(jugadores + 1);
+    
+    printf("\n🚩 BATALLA 1: %s vs %s\n", jugadores[0].nombre, jugadores[1].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 1, "ORCO SALVAJE")) 
+    {
+        victorias++;
+        printf("\n🎉 ¡Ganaste la primera batalla! (%d/4)\n", victorias);
+    } 
+    else 
+    {
+        printf("\n💀 Game Over. Has perdido contra el Orco Salvaje.\n");
+        return 0;
+    }
+    
+    //BATALLA 2-Enemigo Intermedio
+    strcpy(jugadores[2].nombre, "Mago Oscuro");
+    enemigoInterMedio(jugadores + 2);
+    
+    printf("\n🚩 BATALLA 2: %s vs %s\n", jugadores[0].nombre, jugadores[2].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 2, "MAGO OSCURO")) 
+    {
+        victorias++;
+        printf("\n🎉 ¡Ganaste la segunda batalla! (%d/4)\n", victorias);
+    } 
+    else 
+    {
+        printf("\n💀 Game Over. Has perdido contra el Mago Oscuro.\n");
+        return 0;
+    }
+    
+    //BATALLA 3-Enemigo Dificil
+    strcpy(jugadores[3].nombre, "Caballero Negro");
+    enemigoDificil(jugadores + 3);
+    
+    printf("\n🚩 BATALLA 3: %s vs %s\n", jugadores[0].nombre, jugadores[3].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 3, "CABALLERO NEGRO")) 
+    {
+        victorias++;
+        printf("\n🎉 ¡Ganaste la tercera batalla! (%d/4)\n", victorias);
+    } 
+    else 
+    {
+        printf("\n💀 Game Over. Has perdido contra el Caballero Negro.\n");
+        return 0;
+    }
+    
+    //BATALLA 4-Jefe Final
+    strcpy(jugadores[4].nombre, "Dragón de Fuego");
+    jefeFinal(jugadores + 4);
+    
+    printf("\n🚩 BATALLA FINAL: %s vs %s\n", jugadores[0].nombre, jugadores[4].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 4, "DRAGÓN DE FUEGO")) 
+    {
+        victorias++;
+        printf("\n🎊 🎊 🎊 ¡FELICIDADES! 🎊 🎊 🎊\n");
+        printf("¡Has completado todas las batallas! (%d/4)\n", victorias);
+        printf("Eres el verdadero héroe de esta historia.\n");
+    } 
+    else {
+        printf("\n💀 Game Over. Has perdido contra el Dragón de Fuego.\n");
+    }
 
+    return 0;
 }
