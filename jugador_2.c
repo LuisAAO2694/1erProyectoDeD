@@ -434,7 +434,7 @@ void sanacionDivina(void* datos)
     DatosMagia* datosMagia = (DatosMagia*)datos;
     
     //Obtengo el personaje que recibira la curacion
-    Personaje* personajeObjetivo = datosMagia->atacante;
+    Personaje* personajeObjetivo = datosMagia->objetivo;
 
     //Puntos de daño que se curan
     int curacion = 8;
@@ -730,7 +730,7 @@ void crearPersonajeJugador(Personaje* jugador)
         }
     }
     
-    printf("\nMucha suerte muchacho y que nada te sea impedimento para sobrevivir\n");
+    printf("\n........\n");
 }
 
 void mostrarMenuPrincipal()
@@ -1181,6 +1181,18 @@ int main(int argc, char const *argv[])
     };
     
     //BATALLA 1-Enemigo Facil
+
+    printf("===========================================================\n");
+    getchar();
+    printf("ya estas aqui la unica forma de salir es pelear muchacho\n");
+    getchar();
+    printf("te adentras en el mundo desconocido sin saber lo que te espera \n");
+    getchar();
+    printf("A lo lejos lo ves algo grande no sabes si el se dirige a ti o tu lo estas alcansando \n");
+    getchar();
+    printf("parece que tu historia esta apunto de comenzar \n");
+    getchar();
+
     strcpy(jugadores[1].nombre, "Orco Salvaje");
     enemigoFacil(jugadores + 1);
     
@@ -1200,6 +1212,19 @@ int main(int argc, char const *argv[])
     }
     
     //BATALLA 2-Enemigo Intermedio
+
+    printf("===========================================================\n");
+    getchar();
+    printf("lo hiciste bien muchacho aunque casi te llevan JAJAJA\n");
+    getchar();
+    printf("sigamos con la travesia \n");
+    getchar();
+    printf("Mientras mas avancas mas piensas que es una broma de mal gusto, que lo que vives enrealidad no esta pasando \n");
+    getchar();
+    printf("pero es solo enfrente de la montaña que alverga tu siguiente reto cuando lo dejas de lado \n");
+    getchar();
+    printf("necesitas la atenció qui y ahora la batalle te vino a buscar\n");
+
     strcpy(jugadores[2].nombre, "Mago Oscuro");
     enemigoInterMedio(jugadores + 2);
     
@@ -1219,6 +1244,20 @@ int main(int argc, char const *argv[])
     }
     
     //BATALLA 3-Enemigo Dificil
+
+    printf("===========================================================\n");
+    getchar();
+    printf("sales de aquella montaña arrastrando alguno de los artefactos que le arrancaste a esa cosa\n");
+    getchar();
+    printf("lamentablemente para ti aun queda camino \n");
+    getchar();
+    printf("aun que descansas un poco, te quedas junto a una fogata apreciando la noche\n");
+    getchar();
+    printf("justo en ese momento de poca paz dentro del mundo de horrores en el que te encuentras, sientes que algo te ve \n");
+    getchar();
+    printf("y no te queda otra opcion tienes que acabar con el......\n");
+
+
     strcpy(jugadores[3].nombre, "Caballero Negro");
     enemigoDificil(jugadores + 3);
     
@@ -1238,6 +1277,21 @@ int main(int argc, char const *argv[])
     }
     
     //BATALLA 4-Jefe Final
+
+    printf("===========================================================\n");
+    getchar();
+    printf("acabaste con esa cosa por suerte o avilidad ya no esta claro\n");
+    getchar();
+    printf("tras avanzar por mucho tiempo \n");
+    getchar();
+    printf("llegas a aquello que antes solia ser un castillo, lleno de tesoros y vida\n");
+    getchar();
+    printf("solo un fantasma de la realidad que tienes enfrente, nada de lo que hubo esta ahora \n");
+    getchar();
+    printf("al entrar a la sala principal de este lo ves, aquella creatura que por obligacion estas dispuesto a acabar\n");
+    getchar();
+    printf("la pregunta aqui es si lo lograras..... buena suerte\n");
+
     strcpy(jugadores[4].nombre, "Dragón de Fuego");
     jefeFinal(jugadores + 4);
     
