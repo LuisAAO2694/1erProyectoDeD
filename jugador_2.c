@@ -356,7 +356,7 @@ void bendicionFuerza(void* datos)
     DatosMagia* datosMagia = (DatosMagia*)datos;
     
     //Obtengo el personaje objetivo que recibira el buff
-    Personaje* personajeObjetivo = datosMagia->objetivo;
+    Personaje* personajeObjetivo = datosMagia->atacante;
 
     //Aqui guardo el valor original, para poder restaurarlo cuando termine el buff
     //Solo guardamos si no hay buff activo
