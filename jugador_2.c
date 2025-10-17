@@ -642,6 +642,64 @@ void crearPersonajeJugador(Personaje* jugador)
     printf("\nMucha suerte muchacho y que nada te sea impedimento para sobrevivir\n");
 }
 
+void mostrarAventura(){
+    printf("===========================================================\n");
+    getchar();
+    printf("ya estas aqui la unica forma de salir es pelear muchacho\n");
+    getchar();
+    printf("te adentras en el mundo desconocido sin saber lo que te espera \n");
+    getchar();
+    printf("A lo lejos lo ves algo grande no sabes si el se dirige a ti o tu lo estas alcansando \n");
+    getchar();
+    printf("parece que tu historia esta apunto de comenzar \n");
+    getchar();
+
+    // manda llamar pelea con jefe facil
+    printf("===========================================================\n");
+    getchar();
+    printf("lo hiciste bien muchacho aunque casi te llevan JAJAJA\n");
+    getchar();
+    printf("sigamos con la travesia \n");
+    getchar();
+    printf("Mientras mas avancas mas piensas que es una broma de mal gusto, que lo que vives enrealidad no esta pasando \n");
+    getchar();
+    printf("pero es solo enfrente de la montaña que alverga tu siguiente reto cuando lo dejas de lado \n");
+    getchar();
+    printf("necesitas la atenció qui y ahora la batalle te cino a buscar\n");
+
+    // llama a pelea ccon jefe intermedio
+
+    printf("===========================================================\n");
+    getchar();
+    printf("sales de aquella montaña arrastrando alguno de los artefactos que le arrancaste a esa cosa\n");
+    getchar();
+    printf("lamentablemente para ti aun queda camino \n");
+    getchar();
+    printf("aun que descansas un poco, te quedas junto a una fogata apreciando la noche\n");
+    getchar();
+    printf("justo en ese momento de poca paz dentro del mundo de horrores en el que te encuentras, sientes que algo te ve \n");
+    getchar();
+    printf("y no te queda otra opcion tienes que acabar con el......\n");
+
+    // manda llamar la pelea con jefe dificil
+
+    printf("===========================================================\n");
+    getchar();
+    printf("acabaste con esa cosa por suerte o avilidad ya no esta claro\n");
+    getchar();
+    printf("tras avanzar por mucho tiempo \n");
+    getchar();
+    printf("llegas a aquello que antes solia ser un castillo, lleno de tesoros y vida\n");
+    getchar();
+    printf("solo un fantasma de la realidad que tienes enfrente, nada de lo que hubo esta ahora \n");
+    getchar();
+    printf("al entrar a la sala principal de este lo ves, aquella creatura que por obligacion estas dispuesto a acabar\n");
+    getchar();
+    printf("la pregunta aqui es si lo lograras..... buena suerte\n");
+
+    // manda a llamar el jefe final 
+}
+
 void mostrarMenuPrincipal()
 {
     printf("\n");
@@ -723,6 +781,25 @@ int main(int argc, char const *argv[])
     //Bien ahora tenemos que mandar a llamar a la funcion de crear personaje
     //Dato: Paso la direccion del primer elemento del arreglo (&jugadores[0])
     crearPersonajeJugador(jugadores);
+    getchar();
+    mostrarAventura();
 
+    crearPersonajeJugador(&jugadores[0]);
 
+    enemigoFacil(&jugadores[1]);
+    strcpy(jugadores[1].nombre, "Goblin Hambriento");
+    
+    // Enemigo intermedio en jugadores[2]
+    enemigoInterMedio(&jugadores[2]);
+    strcpy(jugadores[2].nombre, "Orco Guerrero");
+    
+    // Enemigo difícil en jugadores[3]
+    enemigoDificil(&jugadores[3]);
+    strcpy(jugadores[3].nombre, "Troll Ancestral");
+    
+    // Jefe final en jugadores[4]
+    jefeFinal(&jugadores[4]);
+    strcpy(jugadores[4].nombre, "Dragón Anciano");
+
+    //estadoDeBatalla(jugadores , );
 }
