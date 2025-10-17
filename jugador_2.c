@@ -434,7 +434,7 @@ void sanacionDivina(void* datos)
     DatosMagia* datosMagia = (DatosMagia*)datos;
     
     //Obtengo el personaje que recibira la curacion
-    Personaje* personajeObjetivo = datosMagia->objetivo;
+    Personaje* personajeObjetivo = datosMagia->atacante;
 
     //Puntos de daño que se curan
     int curacion = 8;
