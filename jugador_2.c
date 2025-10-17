@@ -733,6 +733,64 @@ void crearPersonajeJugador(Personaje* jugador)
     printf("\nMucha suerte muchacho y que nada te sea impedimento para sobrevivir\n");
 }
 
+void mostrarAventura(){
+    printf("===========================================================\n");
+    getchar();
+    printf("ya estas aqui la unica forma de salir es pelear muchacho\n");
+    getchar();
+    printf("te adentras en el mundo desconocido sin saber lo que te espera \n");
+    getchar();
+    printf("A lo lejos lo ves algo grande no sabes si el se dirige a ti o tu lo estas alcansando \n");
+    getchar();
+    printf("parece que tu historia esta apunto de comenzar \n");
+    getchar();
+
+    // manda llamar pelea con jefe facil
+    printf("===========================================================\n");
+    getchar();
+    printf("lo hiciste bien muchacho aunque casi te llevan JAJAJA\n");
+    getchar();
+    printf("sigamos con la travesia \n");
+    getchar();
+    printf("Mientras mas avancas mas piensas que es una broma de mal gusto, que lo que vives enrealidad no esta pasando \n");
+    getchar();
+    printf("pero es solo enfrente de la montaña que alverga tu siguiente reto cuando lo dejas de lado \n");
+    getchar();
+    printf("necesitas la atenció qui y ahora la batalle te cino a buscar\n");
+
+    // llama a pelea ccon jefe intermedio
+
+    printf("===========================================================\n");
+    getchar();
+    printf("sales de aquella montaña arrastrando alguno de los artefactos que le arrancaste a esa cosa\n");
+    getchar();
+    printf("lamentablemente para ti aun queda camino \n");
+    getchar();
+    printf("aun que descansas un poco, te quedas junto a una fogata apreciando la noche\n");
+    getchar();
+    printf("justo en ese momento de poca paz dentro del mundo de horrores en el que te encuentras, sientes que algo te ve \n");
+    getchar();
+    printf("y no te queda otra opcion tienes que acabar con el......\n");
+
+    // manda llamar la pelea con jefe dificil
+
+    printf("===========================================================\n");
+    getchar();
+    printf("acabaste con esa cosa por suerte o avilidad ya no esta claro\n");
+    getchar();
+    printf("tras avanzar por mucho tiempo \n");
+    getchar();
+    printf("llegas a aquello que antes solia ser un castillo, lleno de tesoros y vida\n");
+    getchar();
+    printf("solo un fantasma de la realidad que tienes enfrente, nada de lo que hubo esta ahora \n");
+    getchar();
+    printf("al entrar a la sala principal de este lo ves, aquella creatura que por obligacion estas dispuesto a acabar\n");
+    getchar();
+    printf("la pregunta aqui es si lo lograras..... buena suerte\n");
+
+    // manda a llamar el jefe final 
+}
+
 void mostrarMenuPrincipal()
 {
     printf("\n");
@@ -1175,86 +1233,5 @@ int main(int argc, char const *argv[])
     //Dato: Paso la direccion del primer elemento del arreglo (&jugadores[0])
     crearPersonajeJugador(jugadores);
 
-    const char *nombresEnemigos[] = 
-    {
-        "Orco Salvaje", "Mago Oscuro", "Caballero Negro", "Dragón de Fuego"
-    };
-    
-    //BATALLA 1-Enemigo Facil
-    strcpy(jugadores[1].nombre, "Orco Salvaje");
-    enemigoFacil(jugadores + 1);
-    
-    printf("\n🚩 BATALLA 1: %s vs %s\n", jugadores[0].nombre, jugadores[1].nombre);
-    printf("Presiona Enter para comenzar...");
-    getchar(); getchar();
-    
-    if (batallaCompleta(jugadores + 0, jugadores + 1, "ORCO SALVAJE")) 
-    {
-        victorias++;
-        printf("\n🎉 ¡Ganaste la primera batalla! (%d/4)\n", victorias);
-    } 
-    else 
-    {
-        printf("\n💀 Game Over. Has perdido contra el Orco Salvaje.\n");
-        return 0;
-    }
-    
-    //BATALLA 2-Enemigo Intermedio
-    strcpy(jugadores[2].nombre, "Mago Oscuro");
-    enemigoInterMedio(jugadores + 2);
-    
-    printf("\n🚩 BATALLA 2: %s vs %s\n", jugadores[0].nombre, jugadores[2].nombre);
-    printf("Presiona Enter para comenzar...");
-    getchar(); getchar();
-    
-    if (batallaCompleta(jugadores + 0, jugadores + 2, "MAGO OSCURO")) 
-    {
-        victorias++;
-        printf("\n🎉 ¡Ganaste la segunda batalla! (%d/4)\n", victorias);
-    } 
-    else 
-    {
-        printf("\n💀 Game Over. Has perdido contra el Mago Oscuro.\n");
-        return 0;
-    }
-    
-    //BATALLA 3-Enemigo Dificil
-    strcpy(jugadores[3].nombre, "Caballero Negro");
-    enemigoDificil(jugadores + 3);
-    
-    printf("\n🚩 BATALLA 3: %s vs %s\n", jugadores[0].nombre, jugadores[3].nombre);
-    printf("Presiona Enter para comenzar...");
-    getchar(); getchar();
-    
-    if (batallaCompleta(jugadores + 0, jugadores + 3, "CABALLERO NEGRO")) 
-    {
-        victorias++;
-        printf("\n🎉 ¡Ganaste la tercera batalla! (%d/4)\n", victorias);
-    } 
-    else 
-    {
-        printf("\n💀 Game Over. Has perdido contra el Caballero Negro.\n");
-        return 0;
-    }
-    
-    //BATALLA 4-Jefe Final
-    strcpy(jugadores[4].nombre, "Dragón de Fuego");
-    jefeFinal(jugadores + 4);
-    
-    printf("\n🚩 BATALLA FINAL: %s vs %s\n", jugadores[0].nombre, jugadores[4].nombre);
-    printf("Presiona Enter para comenzar...");
-    getchar(); getchar();
-    
-    if (batallaCompleta(jugadores + 0, jugadores + 4, "DRAGÓN DE FUEGO")) 
-    {
-        victorias++;
-        printf("\n🎊 🎊 🎊 ¡FELICIDADES! 🎊 🎊 🎊\n");
-        printf("¡Has completado todas las batallas! (%d/4)\n", victorias);
-        printf("Eres el verdadero héroe de esta historia.\n");
-    } 
-    else {
-        printf("\n💀 Game Over. Has perdido contra el Dragón de Fuego.\n");
-    }
 
-    return 0;
 }
