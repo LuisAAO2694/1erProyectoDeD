@@ -667,8 +667,42 @@ void mostrarMenuPrincipal()
     sleep(5);
 }
 
+void estadoDeBatalla(Personaje *jugador, Personaje *enemigo){
+
+    printf("\n╔══════════════════════════════════════════════╗\n");
+    printf("║                 ESTADO COMBATE               ║\n");
+    printf("╠══════════════════════════════════════════════╣\n");
+    printf("║ %-20s VS %-20s ║\n", jugador->nombre, enemigo->nombre);
+    printf("║                                              ║\n");
+
+    int vidaJugador = jugador->HP - jugador->danio;
+    if (vidaJugador < 0) vidaJugador = 0;
+    int vidaEnemigo = enemigo->HP - enemigo->danio;
+    if (vidaEnemigo < 0) vidaEnemigo = 0;
+}
+
+void calcularDañoFis(Personaje * atacante, Personaje * recibe){
+    int fak = 0;
+    int danoReduc = 0;
+    if (atacante -> ataqueFisico > recibe -> defensaFisica){
+        fak = atacante -> ataqueFisico - recibe -> defensaFisica;
+        recibe -> HP = recibe -> HP - fak;
+    }
+    if (atacante-> ataqueFisico <= recibe ->defensaFisica){
+        danoReduc = atacante->ataqueFisico / 2;
+        recibe -> HP = recibe -> HP - danoReduc;
+    }
+}
+
+void ataqueFisico(Personaje *atacante, Personaje *defensor){
+    printf("\n⚔️  %s ataca a %s!\n", atacante->nombre, defensor->nombre);
+
+}
+
 int main(int argc, char const *argv[])
 {
+    int victorias = 0;
+    // para que al derrotar a todos se acabe el juego 
     srand(time(NULL));
     //Fer: esto de aca arriba es para el uso del random, referenicias el codigo del profe 
     // aqui un if que tenga que si la vida que esta como hp llega a el mismo valor que daño entonces se pierde 
@@ -684,7 +718,11 @@ int main(int argc, char const *argv[])
     */
     Personaje jugadores[5];
 
+    int turnos = 0 ;
+
     //Bien ahora tenemos que mandar a llamar a la funcion de crear personaje
     //Dato: Paso la direccion del primer elemento del arreglo (&jugadores[0])
     crearPersonajeJugador(jugadores);
+
+
 }
