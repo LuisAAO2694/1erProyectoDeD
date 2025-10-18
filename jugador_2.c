@@ -785,12 +785,11 @@ void mostrarEstadoBatalla(Personaje *jugador, Personaje *enemigo)
 //Esta funcion solo es para calcular el daño fisico 
 int calcularDanioFisico(Personaje *atacante, Personaje *defensor)
 {
-    int danio = atacante->ataqueFisico - defensor->defensaFisica;
-
-    //Daño minimo de 1
-    if(danio < 1)
-    {
-        danio = 1;
+    int danio ;
+    if (atacante -> ataqueFisico <= defensor -> defensaFisica){
+        danio = atacante -> ataqueFisico - 3;
+    }else{
+        danio = atacante -> ataqueFisico  - 2; 
     }
     return danio;
 }
