@@ -76,6 +76,13 @@ const char *nombresAtributos[] =
 {
     "HP", "Ataque Fisico", "Ataque Magico", "Defensa Fisica", "Defensa Magica"
 };
+void bolaFuego(void* datos);
+void congelar(void* objetivo);
+void bendicionFuerza(void* objetivo);
+void maldicionDebilitadora(void* datos);
+void sanacionDivina(void* objetivo);
+void inicializarMagiasDisponibles(void (**magiasDisponibles)(void*));
+void asignarMagiasAleatoriasEnemigo(Personaje *enemigo);
 
 //======================================================================================
 //Aqui creamos una funcion que "crear" un objeto dinamico con atributos aleatorios
@@ -134,6 +141,39 @@ void aplicarObjeto(Personaje *personaje, Objeto *objeto) {
     }
 }
 
+void asignarMagiasAleatoriasEnemigo(Personaje *enemigo) 
+{
+    //Inicializar magias disponibles
+    void (*magiasDisponibles[5])(void*);
+    inicializarMagiasDisponibles(magiasDisponibles);
+    
+    int magiasAsignadas = 0;
+    int indicesSeleccionados[MAX_MAGIAS] = {-1, -1, -1};
+    
+    //Selecionamos 3 magias aleatorias sin repetir
+    while (magiasAsignadas < MAX_MAGIAS) {
+        int indiceAleatorio = rand() % 5;
+        
+        //Checar si ya fue seleccionado
+        int yaSeleccionado = 0;
+        for (int i = 0; i < magiasAsignadas; i++) 
+        {
+            if (indicesSeleccionados[i] == indiceAleatorio) 
+            {
+                yaSeleccionado = 1;
+                break;
+            }
+        }
+        
+        if (!yaSeleccionado)
+        {
+            indicesSeleccionados[magiasAsignadas] = indiceAleatorio;
+            *(enemigo->magia + magiasAsignadas) = *(magiasDisponibles + indiceAleatorio);
+            magiasAsignadas++;
+        }
+    }
+}
+
 // Fer: lo volvi a cambiar xd: es una funcion que inicializa los enemigos  
 // creacion del enemigo facil
 void enemigoFacil(Personaje * enemigo){
@@ -147,7 +187,7 @@ void enemigoFacil(Personaje * enemigo){
     enemigo->turnosCongelado = 0;
     enemigo->buffAtaqueFisico = 0;
     enemigo->debuffDefensaFisica = 0;
-
+    asignarMagiasAleatoriasEnemigo(enemigo);
 }
 
 // funcion para enemigo intermedio
@@ -161,7 +201,8 @@ void enemigoInterMedio(Personaje * enemigo){
     enemigo->turnosCongelado = 0;
     enemigo->buffAtaqueFisico = 0;
     enemigo->debuffDefensaFisica = 0;
-
+    asignarMagiasAleatoriasEnemigo(enemigo);
+    
     // aqui se le tiene que asignar de forma aleatoria las magias y los objetos
     // inicialisamos el inventario del enemigo en NULL 
     for (int i = 0; i < MAX_OBJETOS; i++)
@@ -190,6 +231,7 @@ void enemigoDificil(Personaje * enemigo2){
     enemigo2->turnosCongelado = 0;
     enemigo2->buffAtaqueFisico = 0;
     enemigo2->debuffDefensaFisica = 0;
+    asignarMagiasAleatoriasEnemigo(enemigo2);
 
     for (int i = 0; i < MAX_OBJETOS; i++)
     {
@@ -216,6 +258,7 @@ void jefeFinal(Personaje * enemigo3){
     enemigo3->turnosCongelado = 0;
     enemigo3->buffAtaqueFisico = 0;
     enemigo3->debuffDefensaFisica = 0;
+    asignarMagiasAleatoriasEnemigo(enemigo3);
 
     for (int i = 0; i < MAX_OBJETOS; i++)
     {
@@ -239,10 +282,10 @@ void jefeFinal(Personaje * enemigo3){
 */
 void bolaFuego(void* datos)
 {
-    printf("--- Lanzando Bola De Fuego ---\n");
+    printf("\n--- Lanzando Bola De Fuego ---\n");
 
-    //Primero convierto. el puntero (void*) al tipo que correcto
-    //En este caso loc onvierto a un DatosMagia* para poder acceder a los camposque definimos
+    //Primero convierto el puntero (void*) al tipo que correcto
+    //En este caso lo convierto a un DatosMagia* para poder acceder a los campos que definimos
     DatosMagia* datosMagia = (DatosMagia*)datos;
 
     //Ahora extraigo los personajes de la estructura
@@ -264,29 +307,31 @@ void bolaFuego(void* datos)
     //Se incrementa el daño acumulado al personaje objetivo (sumo el daño y lo registro)
     objetivo->danio += dano;
 
-    printf("!%s lanza una Bola de Fuego!!\n",atacante->nombre);
-    printf("Ataque Magicco (%s): %d vs Defensa Magica (%s): %d\n", atacante->nombre, atacante->ataqueMagico, 
+    printf("!%s lanza una Bola de Fuego!!\n", atacante->nombre);
+    printf("Ataque Magico (%s): %d vs Defensa Magica (%s): %d\n", atacante->nombre, atacante->ataqueMagico, 
         objetivo->nombre, objetivo->defensaMagica);
     
-    printf("!%s recie %d puntos de daño!!\n", objetivo->nombre, dano);
+    printf("!%s recibe %d puntos de daño!!\n", objetivo->nombre, dano);
     printf("Vida restante de %s: %d/%d\n", objetivo->nombre, objetivo->HP - objetivo->danio, objetivo->HP);
 }
 
 /*
     Magia 2: Congelar
-    Proporsito: Hacer que el oponente pierda su siguientte turno
+    Proporsito: Hacer que el oponente pierda su siguiente turno
     Mecanica que pensamos: Ponemos un contador que limite al objeto actuar el siguiente turno
     Tipo de magia: De control/estado
     Requerimientos: una magia debe causar que el oponente pierda el turno que va a ser esta
 */
-void congelar(void *objetivo)
+void congelar(void *datos)
 {
-    printf("--- Lanzando Congelación ---");
+    printf("\n--- Lanzando Congelación ---\n");
 
-    //Bien, aqui convertimos el punter void* a nuestro tipo (personaje*)
-    //En esta magia nomas neceitamos afectar al objetivo, no vamos a neceistar al atacante
-    Personaje* personajeObjeto = (Personaje*)objetivo;
-
+    //Bien, aqui convertimos el puntero void* a nuestro tipo (DatosMagia*)
+    //Ahora recibimos DatosMagia* para ser consistentes con todas las magias
+    DatosMagia* datosMagia = (DatosMagia*)datos;
+    
+    //En esta magia nomas necesitamos afectar al objetivo, no vamos a necesitar al atacante
+    Personaje* personajeObjeto = datosMagia->objetivo;
 
     //Aqui esta el efecto de congelacion
     //turnosCongelado = 1 (necesito que pierda 1 turno)
@@ -299,19 +344,25 @@ void congelar(void *objetivo)
 /*
     Magia 3: Bendicion de fuerza
     Proporsito: Se aumenta el ataque fisico de forma temporal (nomas 3 turnos)
-    Mecanica que pensamos: Solo se aumentta el ataque fisico y ponemos un contador para lo de contar el tiempo
+    Mecanica que pensamos: Solo se aumenta el ataque fisico y ponemos un contador para lo de contar el tiempo
     Tipo de magia: buff de mejora
     Requerimientos: Mejorar uno de los atributos por 3 turnos
 */
-void bendicionFuerza(void* objetivo)
+void bendicionFuerza(void* datos)
 {
-    printf("--- Lanzando Bendición de Fuerza ---");
+    printf("\n--- Lanzando Bendición de Fuerza ---\n");
 
-    //Convierto el puntero void a tipo personaje
-    Personaje* personajeObjetivo = (Personaje*)objetivo;
+    //Convierto el puntero void a tipo DatosMagia*
+    DatosMagia* datosMagia = (DatosMagia*)datos;
+    
+    //Obtengo el personaje objetivo que recibira el buff
+    Personaje* personajeObjetivo = datosMagia->atacante;
 
-    //Aqui guardo el valor original, para poder restauralo cunado termine el buff
-    personajeObjetivo->originalAtaqueFisico = personajeObjetivo->ataqueFisico;
+    //Aqui guardo el valor original, para poder restaurarlo cuando termine el buff
+    //Solo guardamos si no hay buff activo
+    if (personajeObjetivo->buffAtaqueFisico == 0) {
+        personajeObjetivo->originalAtaqueFisico = personajeObjetivo->ataqueFisico;
+    }
     
     //Creo una variable temporal que me sirve para definir cuanto aumenta el ataque
     //Para despues aplicarlo example(originalAtaqueFisico = 5 y aumento = 3)
@@ -337,17 +388,18 @@ void bendicionFuerza(void* objetivo)
 */
 void maldicionDebilitadora(void* datos)
 {
-    printf("--- Lanzando Maldición Debilitadora ---");
+    printf("\n--- Lanzando Maldición Debilitadora ---\n");
 
     //Aqui vuelvo a convertir mi puntero generico a tipo DatosMagia*
     DatosMagia* datosMagia = (DatosMagia*)datos;
-    Personaje* atactante = datosMagia->atacante;
+    Personaje* atacante = datosMagia->atacante;
     Personaje* objetivo = datosMagia->objetivo;
 
     //Primero: Ahora guardo el valor original si es la primera vez que recibe el debuff
+    //Guardamos en buffOriginalDefensaFisica (no en debuffDefensaFisica)
     if(objetivo->debuffDefensaFisica == 0)
     {
-        objetivo->debuffDefensaFisica = objetivo->defensaFisica;
+        objetivo->buffOriginalDefensaFisica = objetivo->defensaFisica;
     }
 
     //Segundo: Aplicamos la reduccion temporal a la defensaFisica
@@ -363,7 +415,7 @@ void maldicionDebilitadora(void* datos)
     //Cuarto: Ponemos la duracion del efecto
     objetivo->debuffDefensaFisica = 3;
 
-    printf("%s lanza Maldicion Debilitadora sobre %s!\n", atactante->nombre, objetivo->nombre);
+    printf("%s lanza Maldicion Debilitadora sobre %s!\n", atacante->nombre, objetivo->nombre);
     printf("Defensa física reducida en %d puntos por 3 turnos\n", reduccion);
     printf("Nueva defensa fisica de %s: %d\n", objetivo->nombre, objetivo->defensaFisica);
 }
@@ -374,17 +426,20 @@ void maldicionDebilitadora(void* datos)
     Mecanica que pensamos: Restaura una cantidad fija de daños 
     Tipo de magia: De curacion
 */
-void sanacionDivina(void* objetivo)
+void sanacionDivina(void* datos)
 {
-    printf("--- Lanzando Sanación Divina ---");
+    printf("\n--- Lanzando Sanación Divina ---\n");
 
-    //Convierto el puntero a tipo Personaje*
-    Personaje* personajeObjetivo = (Personaje*)objetivo;
+    //Convierto el puntero a tipo DatosMagia*
+    DatosMagia* datosMagia = (DatosMagia*)datos;
+    
+    //Obtengo el personaje que recibira la curacion
+    Personaje* personajeObjetivo = datosMagia->objetivo;
 
     //Puntos de daño que se curan
     int curacion = 8;
 
-    //Aplico la curacion reduciiondo el daño acumulado
+    //Aplico la curacion reduciendo el daño acumulado
     personajeObjetivo->danio -= curacion;
 
     //El daño no puede ser negativo
@@ -396,6 +451,42 @@ void sanacionDivina(void* objetivo)
     printf("¡%s recibe Sanación Divina!\n", personajeObjetivo->nombre);
     printf("Restaurados %d puntos de vida.\n", curacion);
     printf("Vida actual: %d/%d\n", personajeObjetivo->HP - personajeObjetivo->danio, personajeObjetivo->HP);
+}
+
+
+
+void bolaFuegoConChequeo(void* datos)
+{
+    printf("\n--- Lanzando Bola De Fuego ---\n");
+
+    DatosMagia* datosMagia = (DatosMagia*)datos;
+    Personaje* atacante = datosMagia->atacante;
+    Personaje* objetivo = datosMagia->objetivo;
+
+    //Verificar si la magia puede pasar la defensa mágica
+    if (atacante->ataqueMagico <= objetivo->defensaMagica) {
+        printf("!%s lanza una Bola de Fuego!\n", atacante->nombre);
+        printf("Ataque Magico (%s): %d vs Defensa Magica (%s): %d\n", 
+               atacante->nombre, atacante->ataqueMagico, 
+               objetivo->nombre, objetivo->defensaMagica);
+        printf("❌ ¡La magia falla! La defensa mágica es muy alta.\n");
+        return;
+    }
+
+    // Calcular daño
+    int dano = atacante->ataqueMagico - objetivo->defensaMagica;
+    if(dano < 1) dano = 1;
+
+    objetivo->danio += dano;
+
+    printf("!%s lanza una Bola de Fuego!!\n", atacante->nombre);
+    printf("Ataque Magico (%s): %d vs Defensa Magica (%s): %d\n", 
+           atacante->nombre, atacante->ataqueMagico, 
+           objetivo->nombre, objetivo->defensaMagica);
+    printf("¡Magia exitosa!\n");
+    printf("!%s recibe %d puntos de daño!!\n", objetivo->nombre, dano);
+    printf("Vida restante de %s: %d/%d\n", objetivo->nombre, 
+           objetivo->HP - objetivo->danio, objetivo->HP);
 }
 
 //Aqui creamos una funcion que lo que hace es actualizar los efectos temporales
@@ -639,65 +730,7 @@ void crearPersonajeJugador(Personaje* jugador)
         }
     }
     
-    printf("\nMucha suerte muchacho y que nada te sea impedimento para sobrevivir\n");
-}
-
-void mostrarAventura(){
-    printf("===========================================================\n");
-    getchar();
-    printf("ya estas aqui la unica forma de salir es pelear muchacho\n");
-    getchar();
-    printf("te adentras en el mundo desconocido sin saber lo que te espera \n");
-    getchar();
-    printf("A lo lejos lo ves algo grande no sabes si el se dirige a ti o tu lo estas alcansando \n");
-    getchar();
-    printf("parece que tu historia esta apunto de comenzar \n");
-    getchar();
-
-    // manda llamar pelea con jefe facil
-    printf("===========================================================\n");
-    getchar();
-    printf("lo hiciste bien muchacho aunque casi te llevan JAJAJA\n");
-    getchar();
-    printf("sigamos con la travesia \n");
-    getchar();
-    printf("Mientras mas avancas mas piensas que es una broma de mal gusto, que lo que vives enrealidad no esta pasando \n");
-    getchar();
-    printf("pero es solo enfrente de la montaña que alverga tu siguiente reto cuando lo dejas de lado \n");
-    getchar();
-    printf("necesitas la atenció qui y ahora la batalle te cino a buscar\n");
-
-    // llama a pelea ccon jefe intermedio
-
-    printf("===========================================================\n");
-    getchar();
-    printf("sales de aquella montaña arrastrando alguno de los artefactos que le arrancaste a esa cosa\n");
-    getchar();
-    printf("lamentablemente para ti aun queda camino \n");
-    getchar();
-    printf("aun que descansas un poco, te quedas junto a una fogata apreciando la noche\n");
-    getchar();
-    printf("justo en ese momento de poca paz dentro del mundo de horrores en el que te encuentras, sientes que algo te ve \n");
-    getchar();
-    printf("y no te queda otra opcion tienes que acabar con el......\n");
-
-    // manda llamar la pelea con jefe dificil
-
-    printf("===========================================================\n");
-    getchar();
-    printf("acabaste con esa cosa por suerte o avilidad ya no esta claro\n");
-    getchar();
-    printf("tras avanzar por mucho tiempo \n");
-    getchar();
-    printf("llegas a aquello que antes solia ser un castillo, lleno de tesoros y vida\n");
-    getchar();
-    printf("solo un fantasma de la realidad que tienes enfrente, nada de lo que hubo esta ahora \n");
-    getchar();
-    printf("al entrar a la sala principal de este lo ves, aquella creatura que por obligacion estas dispuesto a acabar\n");
-    getchar();
-    printf("la pregunta aqui es si lo lograras..... buena suerte\n");
-
-    // manda a llamar el jefe final 
+    printf("\n........\n");
 }
 
 void mostrarMenuPrincipal()
@@ -725,34 +758,393 @@ void mostrarMenuPrincipal()
     sleep(5);
 }
 
-void estadoDeBatalla(Personaje *jugador, Personaje *enemigo){
-
+void mostrarEstadoBatalla(Personaje *jugador, Personaje *enemigo) 
+{
     printf("\n╔══════════════════════════════════════════════╗\n");
     printf("║                 ESTADO COMBATE               ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║ %-20s VS %-20s ║\n", jugador->nombre, enemigo->nombre);
-    printf("║                                              ║\n");
-
+    
     int vidaJugador = jugador->HP - jugador->danio;
     if (vidaJugador < 0) vidaJugador = 0;
     int vidaEnemigo = enemigo->HP - enemigo->danio;
     if (vidaEnemigo < 0) vidaEnemigo = 0;
+    
+    printf("║ ❤️  %3d/%-3d           ❤️  %3d/%-3d              ║\n",
+        vidaJugador, jugador->HP, vidaEnemigo, enemigo->HP);
+
+    printf("║ ⚔️  %-3d              ⚔️  %-3d                   ║\n",
+        jugador->ataqueFisico, enemigo->ataqueFisico);
+
+    printf("║ 🛡️  %-3d              🛡️  %-3d                   ║\n",
+        jugador->defensaFisica, enemigo->defensaFisica);
+
+    printf("╚══════════════════════════════════════════════╝\n");
 }
 
-void calcularDañoFis(Personaje * atacante, Personaje * recibe){
-    int fak = 0;
-    int danoReduc = 0;
-    if (atacante -> ataqueFisico > recibe -> defensaFisica){
-        fak = atacante -> ataqueFisico - recibe -> defensaFisica;
-        recibe -> HP = recibe -> HP - fak;
+//Esta funcion solo es para calcular el daño fisico 
+int calcularDanioFisico(Personaje *atacante, Personaje *defensor)
+{
+    int danio ;
+    if (atacante -> ataqueFisico <= defensor -> defensaFisica){
+        danio = atacante -> ataqueFisico - 3;
+    }else{
+        danio = atacante -> ataqueFisico  - 2; 
     }
-    if (atacante-> ataqueFisico <= recibe ->defensaFisica){
-        danoReduc = atacante->ataqueFisico / 2;
-        recibe -> HP = recibe -> HP - danoReduc;
+    return danio;
+}
+
+//Funcion con la info del ataque fisico 
+void ataqueFisicoData(Personaje *atacante, Personaje *defensor)
+{
+    printf("\n⚔️  %s realiza un ataque fisico!\n", atacante->nombre);
+
+    //Calculamos el daño 
+    int danio = calcularDanioFisico(atacante, defensor);
+
+    //Imprimimos la comparacion 
+    printf("Ataque (%s) %d vs Defensa (%s) %d\n", atacante->nombre, atacante->ataqueFisico, 
+        defensor->nombre, defensor->defensaFisica);
+
+    //Aplicamos el daño
+    defensor->danio += danio;
+
+    printf("¡%s recibe %d puntos de daño! Vida restante: %d/%d\n",
+        defensor->nombre, danio, defensor->HP - defensor->danio, defensor->HP);
+    
+    sleep(2);
+}
+
+//En esta funcion permitimos al usuario usar una de sus magias
+void usarMagia(Personaje *atacante, Personaje *defensor) 
+{
+    printf("\n🔮 %s prepara una magia...\n", atacante->nombre);
+    printf("Tus magias disponibles: \n");
+    
+    //Mostramos las magias disponibles del usuario
+    for (int i = 0; i < MAX_MAGIAS; i++) 
+    {
+        printf("%d. Magia %d\n", i + 1, i + 1);
+    }
+    
+    printf("Elige una magia (1-%d): ", MAX_MAGIAS);
+    int seleccion;
+    scanf("%d", &seleccion);
+    
+    if (seleccion < 1 || seleccion > MAX_MAGIAS) 
+    {
+        printf("❌ Selección inválida. Pierdes el turno.\n");
+        return;
+    }
+    
+    //Obtenemos la magia seleccionada
+    void (*magiaElegida)(void*) = *(atacante->magia + (seleccion - 1));
+    
+    //Preparamos datos para la magia
+    DatosMagia datosMagia;
+    datosMagia.atacante = atacante;
+    datosMagia.objetivo = defensor;
+    
+    //Ejectamos el efecto de la magia
+    magiaElegida(&datosMagia);
+    
+    sleep(2);
+}
+
+int evadir() 
+{
+    printf("\n🏃‍♂️ Preparas una evasion...\n");
+    
+    // ✅ 50% de probabilidad de éxito
+    int exito = rand() % 2;
+    
+    if (exito) {
+        printf("✅ ¡Evasión exitosa! El próximo ataque enemigo fallara.\n");
+    } else {
+        printf("❌ ¡Evasión fallida! El enemigo podrá atacarte normalmente.\n");
+    }
+    
+    sleep(2);
+    return exito;
+}
+
+//Aqui en esta funcion manejamos el turno del jugador
+int turnoJugador(Personaje *jugador, Personaje *enemigo, int *evasionActiva) 
+{
+    printf("\n🎯 TURNO DE %s\n", jugador->nombre);
+    printf("═══════════════════════════════════════\n");
+    
+    //En este if checamos si el jugador esta congelado o na
+    if (jugador->turnosCongelado > 0) 
+    {
+        printf("❄️  ¡Estás congelado! Pierdes este turno\n");
+        jugador->turnosCongelado--;
+        sleep(2);
+
+        return 0;
+    }
+    
+    //Mostramos las opciones disponibles
+    printf("1. ⚔️  Ataque Físico\n");
+    printf("2. 🔮 Usar Magia\n");
+    printf("3. 🏃‍♂️ Evadir\n");
+    printf("Elige tu acción (1-3): ");
+    
+    int accion;
+    scanf("%d", &accion);
+    
+    switch (accion) 
+    {
+        case 1:
+            ataqueFisicoData(jugador, enemigo);
+            break;
+        case 2:
+            usarMagia(jugador, enemigo);
+            break;
+        case 3:
+            *evasionActiva = evadir();
+            break;
+        default:
+            printf("❌ Acción invalida. Pierdes tu turno\n");
+            break;
+    }
+    
+    //Aqui checcamos si el enemigo fue derrotado
+    if (enemigo->danio >= enemigo->HP) 
+    {
+        printf("\n💀 ¡%s ha sido derrotado!!\n", enemigo->nombre);
+        
+        return 1;
+    }
+    return 0;
+}
+
+//Funcion random de ataque fisico del enemigo hacia el usuario
+void AtaqueFisicoCPUEnemigo(Personaje *enemigo, Personaje *jugador, int evasionJugador) 
+{
+    //Checamos si el usuario pudo evadir el ataque
+    if (evasionJugador) 
+    {
+        printf("\n🎯 %s ataca, pero...\n", enemigo->nombre);
+        printf("¡%s evade el ataque exitosamente!\n", jugador->nombre);
+
+        return;
+    }
+    
+    printf("\n🎯 %s realiza un ataque físico!\n", enemigo->nombre);
+    
+    int danio = calcularDanioFisico(enemigo, jugador);
+    
+    printf("Ataque (%s) %d vs Defensa (%s) %d\n",enemigo->nombre, enemigo->ataqueFisico,
+        jugador->nombre, jugador->defensaFisica);
+    
+    jugador->danio += danio;
+    
+    printf("¡%s recibe %d puntos de daño! Vida restante: %d/%d\n",
+        jugador->nombre, danio, jugador->HP - jugador->danio, jugador->HP);
+    
+    sleep(2);
+}
+
+//Funcion random para que el enemigo use sus magias
+void UsarMagiaCPUEnemigo(Personaje *enemigo, Personaje *jugador) 
+{
+    printf("\n🎯 %s prepara una magia...\n", enemigo->nombre);
+    
+    //Elegimos la magia aleatoria
+    int magiaIndex = rand() % MAX_MAGIAS;
+    void (*magiaElegida)(void*) = *(enemigo->magia + magiaIndex);
+
+    //Manejo de erroes nota
+    if (magiaElegida == NULL) 
+    {
+        printf("❌ %s intenta usar magia pero no tiene magias asignadas.\n", enemigo->nombre);
+        return;
+    }
+    
+    //Creamos una variable temporal
+    DatosMagia datosMagia;
+    //Empaqutamos al atacante y el objetivo
+    datosMagia.atacante = enemigo;
+    datosMagia.objetivo = jugador;
+    
+    //Ejecutamos la magia
+    magiaElegida(&datosMagia);
+    
+    sleep(2);
+}
+
+//Esta funcion la pensamos para manejar el turno del enemigo/CPU
+//Retorna: 1 si el jugador fue derrotado y 0 si continua la batalla
+int turnoCPU(Personaje *enemigo, Personaje *jugador, int evasionJugador) 
+{
+    printf("\n🤖 TURNO DE %s\n", enemigo->nombre);
+    printf("═══════════════════════════════════════\n");
+    
+    //Reciclamos el if, para checar si esta congelado el brou
+    if (enemigo->turnosCongelado > 0) 
+    {
+        printf("❄️  ¡%s está congelado! Pierde este turno.\n", enemigo->nombre);
+        enemigo->turnosCongelado--;
+        sleep(2);
+        
+        return 0;
+    }
+    
+    //
+    int accion = rand() % 10; //Generamos un numero de 0-9
+    
+    if (accion < 7) 
+    { 
+        // 0-6 = 7 valores → 70% probabilidad
+        AtaqueFisicoCPUEnemigo(enemigo, jugador, evasionJugador);
+    } 
+    else 
+    { 
+        // 7-9 = 3 valores → 30% probabilidad  
+        UsarMagiaCPUEnemigo(enemigo, jugador);
+    }
+    
+    //Checamos si el jugador fue vencido
+    if (jugador->danio >= jugador->HP) 
+    {
+        printf("\n💀 ¡%s ha sido derrotado!\n", jugador->nombre);
+        return 1;
+    }
+    
+    return 0;
+}
+
+//Esta es la funcion de las recompensas por batalla
+void elegirObjetosRecompensa(Personaje *jugador) 
+{
+    printf("\n¡VICTORIA! Elige 2 objetos de recompensa:\n");
+    printf("═══════════════════════════════════════════════\n");
+    
+    //Generamos 4 objetos de manera aleatoria btw
+    Objeto *opciones[4];
+    for (int i = 0; i < 4; i++) 
+    {
+        *(opciones + i) = crearObjetoAleatorio();
+        printf("%d. %s (+%d a %s)\n", i + 1, 
+            (*(opciones + i))->nombre,
+            (*(opciones + i))->poder,
+            nombresAtributos[(*(opciones + i))->atributo]);
+    }
+    
+    //Este es el arreglo para guardar las selecciones del jugador
+    //-1 aun no se ha elegido ese slot, pd: son 2 slots
+    int elegidos[2] = {-1, -1};
+
+    //Contar cuantos cuentos jaja no se crean 
+    //Contar cuantos objetos ha elegido el usuario 
+    int objetosElegidos = 0;
+    
+    printf("\nElige 2 objetos (1-4):\n");
+    
+    while (objetosElegidos < 2) 
+    {
+        printf("Objeto %d/2: ", objetosElegidos + 1);
+        int seleccion;
+        scanf("%d", &seleccion);
+        
+        if (seleccion < 1 || seleccion > 4) {
+            printf("Número inválido. Elige 1-4.\n");
+            continue;
+        }
+        
+        //Checamos si ya se eligio
+        int yaElegido = 0;
+        for (int i = 0; i < objetosElegidos; i++) 
+        {
+            if (*(elegidos + i) == seleccion) 
+            {
+                yaElegido = 1;
+                break;
+            }
+        }
+        
+        if (yaElegido) 
+        {
+            printf("Ya elegiste ese objeto.\n");
+            continue;
+        }
+        
+        //Darle el objeto elegido
+        *(elegidos + objetosElegidos) = seleccion;
+        Objeto *obj = *(opciones + (seleccion - 1));
+        aplicarObjeto(jugador, obj);
+        printf("✅ %s aplicado!\n", obj->nombre);
+        objetosElegidos++;
+    }
+    
+    //El bendito free para liberar los objetos
+    for (int i = 0; i < 4; i++) 
+    {
+        int fueElegido = 0;
+        for (int j = 0; j < 2; j++) 
+        {
+            if (*(elegidos + j) == i + 1) 
+            {
+                fueElegido = 1;
+                break;
+            }
+        }
+        if (!fueElegido) 
+        {
+            free(*(opciones + i));
+        }
     }
 }
 
-void ataqueFisico(Personaje *atacante, Personaje *defensor){
+//Esta funcion la destinamos a ejectuar la batalla completa
+//Retornamos 1 si el usuario gana y 0 si pierde
+int batallaCompleta(Personaje *jugador, Personaje *enemigo, const char *nombreEnemigo) 
+{
+    printf("\n⚔️ ⚔️ ⚔️  COMIENZA LA BATALLA CONTRA %s ⚔️ ⚔️ ⚔️\n", nombreEnemigo);
+    
+    //Reiniciamos el daño para la nueva batalla
+    jugador->danio = 0;
+    enemigo->danio = 0;
+    
+    int evasionJugador = 0;
+    int turno = 1;
+    
+    //Este while nos sirve para ver el estado de la batalla, bueno el turno de la batalla
+    while (1) {
+        printf("\n----  TURNO %d ----\n", turno);
+        
+        mostrarEstadoBatalla(jugador, enemigo);
+        
+        //Turno del usuario
+        if (turnoJugador(jugador, enemigo, &evasionJugador)) 
+        {
+            //Usuario gano
+            elegirObjetosRecompensa(jugador);
+            return 1;
+        }
+        
+        //Turno del enemigo
+        if (turnoCPU(enemigo, jugador, evasionJugador)) 
+        {
+            //Usuario perdio
+            return 0;
+        }
+        
+        //Actualizamos los efectos temporales
+        actualizarEfectosTemporales(jugador);
+        actualizarEfectosTemporales(enemigo);
+        
+        //Resetamos la evasion para proximo turno
+        evasionJugador = 0;
+        turno++;
+        
+        sleep(1);
+    }
+}
+
+void ataqueFisico(Personaje *atacante, Personaje *defensor)
+{
     printf("\n⚔️  %s ataca a %s!\n", atacante->nombre, defensor->nombre);
 
 }
@@ -781,25 +1173,141 @@ int main(int argc, char const *argv[])
     //Bien ahora tenemos que mandar a llamar a la funcion de crear personaje
     //Dato: Paso la direccion del primer elemento del arreglo (&jugadores[0])
     crearPersonajeJugador(jugadores);
+
+    const char *nombresEnemigos[] = 
+    {
+        "Orco Salvaje", "Mago Oscuro", "Caballero Negro", "Dragón de Fuego"
+    };
+    
+    //BATALLA 1-Enemigo Facil
+
+    printf("===========================================================\n");
     getchar();
-    mostrarAventura();
+    printf("ya estas aqui la unica forma de salir es pelear muchacho\n");
+    getchar();
+    printf("te adentras en el mundo desconocido sin saber lo que te espera \n");
+    getchar();
+    printf("A lo lejos lo ves algo grande no sabes si el se dirige a ti o tu lo estas alcansando \n");
+    getchar();
+    printf("parece que tu historia esta apunto de comenzar \n");
+    getchar();
 
-    crearPersonajeJugador(&jugadores[0]);
+    strcpy(jugadores[1].nombre, "Orco Salvaje");
+    enemigoFacil(jugadores + 1);
+    
+    printf("\n🚩 BATALLA 1: %s vs %s\n", jugadores[0].nombre, jugadores[1].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 1, "ORCO SALVAJE")) 
+    {
+        victorias++;
+        printf("\n🎉 ¡Ganaste la primera batalla! (%d/4)\n", victorias);
+    } 
+    else 
+    {
+        printf("\n💀 Game Over. Has perdido contra el Orco Salvaje.\n");
+        return 0;
+    }
+    
+    //BATALLA 2-Enemigo Intermedio
 
-    enemigoFacil(&jugadores[1]);
-    strcpy(jugadores[1].nombre, "Goblin Hambriento");
-    
-    // Enemigo intermedio en jugadores[2]
-    enemigoInterMedio(&jugadores[2]);
-    strcpy(jugadores[2].nombre, "Orco Guerrero");
-    
-    // Enemigo difícil en jugadores[3]
-    enemigoDificil(&jugadores[3]);
-    strcpy(jugadores[3].nombre, "Troll Ancestral");
-    
-    // Jefe final en jugadores[4]
-    jefeFinal(&jugadores[4]);
-    strcpy(jugadores[4].nombre, "Dragón Anciano");
+    printf("===========================================================\n");
+    getchar();
+    printf("lo hiciste bien muchacho aunque casi te llevan JAJAJA\n");
+    getchar();
+    printf("sigamos con la travesia \n");
+    getchar();
+    printf("Mientras mas avancas mas piensas que es una broma de mal gusto, que lo que vives enrealidad no esta pasando \n");
+    getchar();
+    printf("pero es solo enfrente de la montaña que alverga tu siguiente reto cuando lo dejas de lado \n");
+    getchar();
+    printf("necesitas la atenció qui y ahora la batalle te vino a buscar\n");
 
-    //estadoDeBatalla(jugadores , );
+    strcpy(jugadores[2].nombre, "Mago Oscuro");
+    enemigoInterMedio(jugadores + 2);
+    
+    printf("\n🚩 BATALLA 2: %s vs %s\n", jugadores[0].nombre, jugadores[2].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 2, "MAGO OSCURO")) 
+    {
+        victorias++;
+        printf("\n🎉 ¡Ganaste la segunda batalla! (%d/4)\n", victorias);
+    } 
+    else 
+    {
+        printf("\n💀 Game Over. Has perdido contra el Mago Oscuro.\n");
+        return 0;
+    }
+    
+    //BATALLA 3-Enemigo Dificil
+
+    printf("===========================================================\n");
+    getchar();
+    printf("sales de aquella montaña arrastrando alguno de los artefactos que le arrancaste a esa cosa\n");
+    getchar();
+    printf("lamentablemente para ti aun queda camino \n");
+    getchar();
+    printf("aun que descansas un poco, te quedas junto a una fogata apreciando la noche\n");
+    getchar();
+    printf("justo en ese momento de poca paz dentro del mundo de horrores en el que te encuentras, sientes que algo te ve \n");
+    getchar();
+    printf("y no te queda otra opcion tienes que acabar con el......\n");
+
+
+    strcpy(jugadores[3].nombre, "Caballero Negro");
+    enemigoDificil(jugadores + 3);
+    
+    printf("\n🚩 BATALLA 3: %s vs %s\n", jugadores[0].nombre, jugadores[3].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 3, "CABALLERO NEGRO")) 
+    {
+        victorias++;
+        printf("\n🎉 ¡Ganaste la tercera batalla! (%d/4)\n", victorias);
+    } 
+    else 
+    {
+        printf("\n💀 Game Over. Has perdido contra el Caballero Negro.\n");
+        return 0;
+    }
+    
+    //BATALLA 4-Jefe Final
+
+    printf("===========================================================\n");
+    getchar();
+    printf("acabaste con esa cosa por suerte o avilidad ya no esta claro\n");
+    getchar();
+    printf("tras avanzar por mucho tiempo \n");
+    getchar();
+    printf("llegas a aquello que antes solia ser un castillo, lleno de tesoros y vida\n");
+    getchar();
+    printf("solo un fantasma de la realidad que tienes enfrente, nada de lo que hubo esta ahora \n");
+    getchar();
+    printf("al entrar a la sala principal de este lo ves, aquella creatura que por obligacion estas dispuesto a acabar\n");
+    getchar();
+    printf("la pregunta aqui es si lo lograras..... buena suerte\n");
+
+    strcpy(jugadores[4].nombre, "Dragón de Fuego");
+    jefeFinal(jugadores + 4);
+    
+    printf("\n🚩 BATALLA FINAL: %s vs %s\n", jugadores[0].nombre, jugadores[4].nombre);
+    printf("Presiona Enter para comenzar...");
+    getchar(); getchar();
+    
+    if (batallaCompleta(jugadores + 0, jugadores + 4, "DRAGÓN DE FUEGO")) 
+    {
+        victorias++;
+        printf("\n🎊 🎊 🎊 ¡FELICIDADES! 🎊 🎊 🎊\n");
+        printf("¡Has completado todas las batallas! (%d/4)\n", victorias);
+        printf("Eres el verdadero héroe de esta historia.\n");
+    } 
+    else {
+        printf("\n💀 Game Over. Has perdido contra el Dragón de Fuego.\n");
+    }
+
+    return 0;
 }
