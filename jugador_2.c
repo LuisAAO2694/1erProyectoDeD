@@ -334,8 +334,9 @@ void congelar(void *datos)
     Personaje* personajeObjeto = datosMagia->objetivo;
 
     //Aqui esta el efecto de congelacion
-    //turnosCongelado = 1 (necesito que pierda 1 turno)
-    personajeObjeto->turnosCongelado = 1;
+    //turnosCongelado = 2 para que pierda 1 turno completo
+    //Esto es porque actualizarEfectosTemporales() se llama al final de cada turno xd
+    personajeObjeto->turnosCongelado = 2;
 
     printf("¡Hechizo Congelar lanzado!\n");
     printf("%s esta congelado y perdera su siguiente turno\n", personajeObjeto->nombre);
