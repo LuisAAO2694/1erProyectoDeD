@@ -298,9 +298,11 @@ void bolaFuego(void* datos)
 
     //Ahora aseguramos que el daño minimo sea de 1
     //Btw evitamos que el daño sea 0 o negativo
-    if(dano < 1)
+    if(atacante -> ataqueMagico <= objetivo -> defensaMagica)
     {
-        dano = 1;
+        dano = atacante -> ataqueMagico -3;
+    }else{
+        dano = atacante -> ataqueMagico -2;
     }
 
     //Aplico el daño
@@ -359,10 +361,12 @@ void bendicionFuerza(void* datos)
     //Obtengo el personaje objetivo que recibira el buff
     Personaje* personajeObjetivo = datosMagia->atacante;
 
+    int copi = personajeObjetivo -> ataqueFisico;
+
     //Aqui guardo el valor original, para poder restaurarlo cuando termine el buff
     //Solo guardamos si no hay buff activo
     if (personajeObjetivo->buffAtaqueFisico == 0) {
-        personajeObjetivo->originalAtaqueFisico = personajeObjetivo->ataqueFisico;
+        personajeObjetivo->originalAtaqueFisico = copi;
     }
     
     //Creo una variable temporal que me sirve para definir cuanto aumenta el ataque
@@ -435,7 +439,7 @@ void sanacionDivina(void* datos)
     DatosMagia* datosMagia = (DatosMagia*)datos;
     
     //Obtengo el personaje que recibira la curacion
-    Personaje* personajeObjetivo = datosMagia->objetivo;
+    Personaje* personajeObjetivo = datosMagia->atacante;
 
     //Puntos de daño que se curan
     int curacion = 8;
